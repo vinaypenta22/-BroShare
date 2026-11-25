@@ -3,6 +3,7 @@ from pathlib import Path
 
 import os
 import dj_database_url
+from corsheaders.defaults import default_headers
 from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
 
@@ -31,7 +32,11 @@ SECRET_KEY = env("SECRET_KEY", default="local-development-key-only-change-before
 if not DEBUG and SECRET_KEY.startswith("local-development"):
     raise ImproperlyConfigured("Set a production SECRET_KEY or enable DEBUG for local use.")
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+render_hostname = env("RENDER_EXTERNAL_HOSTNAME", "").strip()
+if render_hostname and render_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_hostname)
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost:5173"])
+CORS_ALLOW_HEADERS = (*default_headers, "x-flat-id")
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 TIME_ZONE = env("TIME_ZONE", default="Asia/Kolkata")
 USE_TZ = True
